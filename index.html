@@ -195,6 +195,62 @@
       bottom: -60px; left: -80px;
       width: 420px; height: 420px;
       background: radial-gradient(circle, rgba(30,48,72,0.8) 0%, transparent 70%);
+    }
+
+    /* ===========================
+       MODAL FORM
+    =========================== */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: var(--navy-light);
+      padding: 24px;
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 480px;
+      color: var(--white);
+    }
+    .modal-content h2 { margin-bottom: 12px; }
+    .modal-content label {
+      display: block;
+      margin: 8px 0 4px;
+      font-size: 0.9rem;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--gray-soft);
+      border-radius: 4px;
+      background: var(--navy);
+      color: var(--white);
+    }
+    .modal-content button {
+      margin-top: 16px;
+      background: var(--orange);
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      color: var(--white);
+      cursor: pointer;
+    }
+    .modal-content .close-btn {
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 8px; right: 12px;
+      font-size: 1.2rem;
+      color: var(--white);
+      cursor: pointer;
+    }
       border-radius: 50%;
       pointer-events: none;
     }
@@ -1067,7 +1123,7 @@
         <a href="#process">Fonctionnement</a>
         <a href="#faq">FAQ</a>
       </div>
-      <a href="#cta-final" class="nav-cta">Audit gratuit →</a>
+      <a href="#" class="nav-cta open-form">Audit gratuit →</a>
     </div>
   </nav>
 
@@ -1090,7 +1146,7 @@
         </p>
 
         <div class="hero-actions">
-          <a href="#cta-final" class="btn-primary">
+          <a href="#" class="btn-primary open-form">
             Réserver un audit gratuit
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1265,7 +1321,7 @@
             <li>Archivage numérique</li>
             <li>Support par email</li>
           </ul>
-          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+          <a href="#" class="btn-pack open-form">Prendre rendez-vous</a>
         </div>
 
         <!-- Pack Confort (featured) -->
@@ -1280,7 +1336,7 @@
             <li>Support WhatsApp</li>
             <li>Onboarding dédié</li>
           </ul>
-          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+          <a href="#" class="btn-pack open-form">Prendre rendez-vous</a>
         </div>
 
         <!-- Pack Premium -->
@@ -1295,7 +1351,7 @@
             <li>Support prioritaire</li>
             <li>Documents illimités</li>
           </ul>
-          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+          <a href="#" class="btn-pack open-form">Prendre rendez-vous</a>
         </div>
 
         <!-- Pack Signature -->
@@ -1311,7 +1367,7 @@
             <li>2 appels stratégiques/mois</li>
             <li>Support prioritaire &lt;12h</li>
           </ul>
-          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+          <a href="#" class="btn-pack open-form">Prendre rendez-vous</a>
         </div>
 
       </div>
@@ -1433,7 +1489,7 @@
 
         <p>Réservez votre audit gratuit de 30 minutes. Sans engagement, sans jargon — juste une conversation honnête sur ce qu'on peut faire pour vous.</p>
 
-        <a href="mailto:contact@stillfi.fr?subject=Demande d'audit gratuit" class="btn-primary" style="display: inline-flex; font-size: 1.05rem; padding: 18px 40px;">
+        <a href="#" class="btn-primary open-form" style="display: inline-flex; font-size: 1.05rem; padding: 18px 40px;">
           Réserver mon audit gratuit
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1522,5 +1578,52 @@
   </script>
 
 <!-- Version: 1.0.2 -->
+  <!-- modal form -->
+  <div class="modal" id="contactModal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal">×</button>
+      <h2>Demande d'audit</h2>
+      <form action="mailto:youremail@example.com" method="post" enctype="text/plain">
+        <label for="nom">Nom</label>
+        <input type="text" id="nom" name="Nom" required />
+
+        <label for="prenom">Prénom</label>
+        <input type="text" id="prenom" name="Prénom" required />
+
+        <label for="tel">Téléphone</label>
+        <input type="tel" id="tel" name="Téléphone" required />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="Email" required />
+
+        <label for="profession">Profession</label>
+        <input type="text" id="profession" name="Profession" required />
+
+        <button type="submit">Envoyer</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const openBtns = document.querySelectorAll('.open-form');
+    const modal = document.getElementById('contactModal');
+    const closeBtn = document.getElementById('closeModal');
+
+    openBtns.forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        modal.classList.add('show');
+      });
+    });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+    });
+
+    // close when clicking outside content
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.remove('show');
+    });
+  </script>
 </body>
 </html>
