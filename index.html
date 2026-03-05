@@ -1653,7 +1653,9 @@
       <button class="close-btn" id="closeModal">×</button>
       <h2>Réserver mon rendez-vous</h2>
       <p>Rendez-vous de 30 minutes</p>
-      <form id="contactForm">
+      <form id="contactForm" action="mailto:contact@stillfi.fr" method="post" enctype="text/plain">
+        <input type="hidden" name="subject" value="Demande de rendez-vous - StillFi" />
+        <input type="hidden" name="body" id="emailBody" />
         <label for="nom">Nom *<span class="asterisk"></span></label>
         <input type="text" id="nom" name="Nom" placeholder="Votre nom" required />
 
@@ -1707,45 +1709,57 @@
       });
     }
 
-    /* form submission via Formspree */
+    /* form submission with pre-filled email */
     const contactForm = document.getElementById('contactForm');
     const formMessage = document.getElementById('formMessage');
 
     if (contactForm) {
-      contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      contactForm.addEventListener('submit', (e) => {
+        const nom = document.getElementById('nom').value;
+        const prenom = document.getElementById('prenom').value;
+        const tel = document.getElementById('tel').value;
+        const email = document.getElementById('email').value;
+        const profession = document.getElementById('profession').value;
 
-        const formData = new FormData(contactForm);
-        
-        try {
-          const response = await fetch('https://formspree.io/contact@stillfi.fr', {
-            method: 'POST',
-            body: formData,
-            headers: {
-              'Accept': 'application/json'
-            }
-          });
+        const emailBody = `
+[Logo StillFi: https://stillfi.fr/logo.png]
 
-          if (response.ok) {
-            // hide form, show success message
-            contactForm.style.display = 'none';
-            formMessage.style.display = 'block';
+========================================
+          STILLFI
+   Back-office externalisé pour artisans
+========================================
 
-            // close modal after 2 seconds
-            setTimeout(() => {
-              modal.classList.remove('show');
-              contactForm.style.display = 'block';
-              formMessage.style.display = 'none';
-              contactForm.reset();
-            }, 2000);
-          } else {
-            alert('Une erreur s\'est produite. Veuillez réessayer.');
-          }
-        } catch (error) {
-          console.error('Erreur:', error);
-          alert('Une erreur s\'est produite. Vérifiez votre connexion.');
-        }
+Bonjour,
+
+Nouvelle demande de rendez-vous depuis le site StillFi.
+
+Informations du demandeur :
+- Nom : ${nom}
+- Prénom : ${prenom}
+- Téléphone : ${tel}
+- Email : ${email}
+- Profession : ${profession}
+
+Cordialement,
+L'équipe StillFi
+========================================
+        `;
+
+        document.getElementById('emailBody').value = emailBody;
+
+        // Show success message
+        contactForm.style.display = 'none';
+        formMessage.style.display = 'block';
+
+        // Close modal after 3 seconds
+        setTimeout(() => {
+          modal.classList.remove('show');
+          contactForm.style.display = 'block';
+          formMessage.style.display = 'none';
+          contactForm.reset();
+        }, 3000);
       });
+    }
     }
   </script>
 </body>
