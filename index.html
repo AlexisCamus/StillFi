@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StillFi – Back-office externalisé pour artisans</title>
+  <meta name="description" content="StillFi gère vos devis, factures et relances pendant que vous êtes sur le chantier." />
+
+  <!-- Google Fonts : Playfair Display (display) + DM Sans (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================
+       VARIABLES & RESET
+    =========================== */
+    :root {
+      --navy:       #0D1B2A;
+      --navy-mid:   #132233;
+      --navy-light: #1E3048;
+      --orange:     #F26419;
+      --orange-lt:  #FF8040;
+      --cream:      #F5F0E8;
+      --white:      #FFFFFF;
+      --gray-soft:  #E8E4DC;
+      --gray-text:  #8A94A0;
+      --border:     rgba(255,255,255,0.08);
+
+      --ff-display: 'Playfair Display', Georgia, serif;
+      --ff-body:    'DM Sans', sans-serif;
+
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow-card: 0 4px 32px rgba(0,0,0,0.25);
+      --radius: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--ff-body);
+      background: var(--navy);
+      color: var(--white);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===========================
+       TYPOGRAPHY UTILITIES
+    =========================== */
+    .section-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--orange);
+      border: 1px solid rgba(242,100,25,0.35);
+      border-radius: 30px;
+      padding: 5px 14px;
+      margin-bottom: 20px;
+    }
+
+    h2.section-title {
+      font-family: var(--ff-display);
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    h2.section-title span { color: var(--orange); }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--gray-text);
+      max-width: 560px;
+      line-height: 1.75;
+    }
+
+    /* ===========================
+       LAYOUT
+    =========================== */
+    .container {
+      width: 92%;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    section { padding: 96px 0; }
+
+    /* ===========================
+       NAV
+    =========================== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0;
+      transition: background var(--transition), box-shadow var(--transition);
+    }
+
+    nav.scrolled {
+      background: rgba(13, 27, 42, 0.96);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      width: 92%;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-family: var(--ff-display);
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    .logo span { color: var(--orange); }
+
+    .nav-menu {
+      display: flex;
+      gap: 16px;
+    }
+
+    .nav-menu a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--white);
+      background: rgba(242, 100, 25, 0.15);
+      border: 1px solid rgba(242, 100, 25, 0.3);
+      padding: 8px 18px;
+      border-radius: 6px;
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+
+    .nav-menu a:hover {
+      background: var(--orange);
+      color: var(--white);
+      border-color: var(--orange);
+    }
+
+    .nav-cta {
+      background: var(--orange);
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 6px;
+      transition: background var(--transition), transform var(--transition);
+    }
+
+    .nav-cta:hover {
+      background: var(--orange-lt);
+      transform: translateY(-1px);
+    }
+
+    /* ===========================
+       HERO
+    =========================== */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 120px 0 80px;
+    }
+
+    /* Geometric background shapes */
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -120px;
+      width: 680px; height: 680px;
+      background: radial-gradient(circle, rgba(242,100,25,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -80px;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(30,48,72,0.8) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* Grid texture overlay */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(242,100,25,0.12);
+      border: 1px solid rgba(242,100,25,0.3);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--orange-lt);
+      margin-bottom: 32px;
+      letter-spacing: 0.05em;
+    }
+
+    .hero-tag::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--orange);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-family: var(--ff-display);
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      font-weight: 900;
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 28px;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--orange);
+      position: relative;
+    }
+
+    h1 em::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 0; right: 0;
+      height: 3px;
+      background: var(--orange);
+      opacity: 0.4;
+      border-radius: 2px;
+    }
+
+    .hero-sub {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.65);
+      max-width: 520px;
+      margin-bottom: 48px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--orange);
+      color: var(--white);
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 16px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 0 0 0 rgba(242,100,25,0.4);
+    }
+
+    .btn-primary:hover {
+      background: var(--orange-lt);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(242,100,25,0.35);
+    }
+
+    .btn-primary svg { transition: transform var(--transition); }
+    .btn-primary:hover svg { transform: translateX(4px); }
+
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gray-text);
+      font-size: 0.85rem;
+    }
+
+    .hero-trust-dots {
+      display: flex;
+      gap: -4px;
+    }
+
+    .hero-trust-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--navy);
+      background: var(--navy-light);
+      margin-left: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--orange);
+    }
+
+    .hero-trust-dot:first-child { margin-left: 0; }
+
+    /* Floating stats card */
+    .hero-stat-card {
+      position: absolute;
+      bottom: 80px; right: 5%;
+      background: rgba(30,48,72,0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      animation: float 5s ease-in-out infinite;
+      z-index: 3;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .stat-num {
+      font-family: var(--ff-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--orange);
+      line-height: 1;
+    }
+
+    .stat-label { font-size: 0.8rem; color: var(--gray-text); margin-top: 4px; }
+
+    /* ===========================
+       PROBLEMS SECTION
+    =========================== */
+    #problemes {
+      background: var(--navy-mid);
+      position: relative;
+    }
+
+    #problemes::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(242,100,25,0.4), transparent);
+    }
+
+    .problems-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      margin-top: 56px;
+    }
+
+    .problem-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 28px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .problem-card:hover {
+      border-color: rgba(242,100,25,0.3);
+      transform: translateY(-3px);
+    }
+
+    .problem-icon {
+      flex-shrink: 0;
+      width: 48px; height: 48px;
+      background: rgba(242,100,25,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .problem-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+
+    .problem-card p {
+      font-size: 0.9rem;
+      color: var(--gray-text);
+      line-height: 1.6;
+    }
+
+    .problems-visual {
+      text-align: center;
+    }
+
+    .problems-quote {
+      background: var(--navy-light);
+      border-left: 4px solid var(--orange);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 32px;
+      font-family: var(--ff-display);
+      font-size: 1.3rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.55;
+    }
+
+    .problems-quote cite {
+      display: block;
+      font-family: var(--ff-body);
+      font-style: normal;
+      font-size: 0.85rem;
+      color: var(--orange);
+      margin-top: 16px;
+      font-weight: 500;
+    }
+
+    /* ===========================
+       SOLUTION SECTION
+    =========================== */
+    #solution { background: var(--navy); }
+
+    .solution-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .solution-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .solution-list li {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background var(--transition), border-color var(--transition);
+      cursor: default;
+    }
+
+    .solution-list li:hover {
+      background: rgba(242,100,25,0.07);
+      border-color: rgba(242,100,25,0.25);
+    }
+
+    .sol-check {
+      width: 28px; height: 28px;
+      flex-shrink: 0;
+      background: rgba(242,100,25,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .solution-visual {
+      position: relative;
+    }
+
+    .sol-card-stack {
+      position: relative;
+      height: 380px;
+    }
+
+    .sol-card {
+      position: absolute;
+      background: var(--navy-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      width: 100%;
+    }
+
+    .sol-card:nth-child(1) {
+      top: 0;
+      z-index: 3;
+      background: linear-gradient(135deg, var(--navy-light), rgba(242,100,25,0.08));
+      border-color: rgba(242,100,25,0.2);
+    }
+
+    .sol-card:nth-child(2) {
+      top: 40px;
+      z-index: 2;
+      transform: scale(0.97);
+      opacity: 0.7;
+    }
+
+    .sol-card:nth-child(3) {
+      top: 75px;
+      z-index: 1;
+      transform: scale(0.94);
+      opacity: 0.4;
+    }
+
+    .sol-card-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .sol-card-title {
+      font-family: var(--ff-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .sol-card-line {
+      height: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+
+    .sol-card-line.short { width: 65%; }
+    .sol-card-line.accent { background: rgba(242,100,25,0.3); width: 40%; }
+
+    .sol-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sol-badge {
+      background: rgba(242,100,25,0.15);
+      color: var(--orange);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    /* ===========================
+       OFFRES / PRICING
+    =========================== */
+    #offres {
+      background: var(--navy-mid);
+      position: relative;
+    }
+
+    #offres::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(242,100,25,0.4), transparent);
+    }
+
+    .offres-header { text-align: center; margin-bottom: 56px; }
+    .offres-header .section-sub { margin: 0 auto; }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .pack-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 26px;
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pack-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(242,100,25,0.35);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* Featured card */
+    .pack-card.featured {
+      background: linear-gradient(160deg, rgba(242,100,25,0.12), rgba(30,48,72,0.6));
+      border-color: rgba(242,100,25,0.4);
+    }
+
+    .pack-card.featured::before {
+      content: 'Populaire';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      background: var(--orange);
+      color: var(--white);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 20px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .pack-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 10px;
+    }
+
+    .pack-price {
+      font-family: var(--ff-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .pack-price span {
+      font-family: var(--ff-body);
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--gray-text);
+    }
+
+    .pack-desc {
+      font-size: 0.85rem;
+      color: var(--gray-text);
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    .pack-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      margin-bottom: 32px;
+    }
+
+    .pack-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.4;
+    }
+
+    .pack-features li::before {
+      content: '✓';
+      flex-shrink: 0;
+      color: var(--orange);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-top: 1px;
+    }
+
+    .btn-pack {
+      display: block;
+      text-align: center;
+      padding: 13px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid rgba(242,100,25,0.4);
+      color: var(--orange);
+      background: transparent;
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+
+    .btn-pack:hover,
+    .pack-card.featured .btn-pack {
+      background: var(--orange);
+      color: var(--white);
+      transform: translateY(-1px);
+    }
+
+    .pack-card.featured .btn-pack:hover {
+      background: var(--orange-lt);
+    }
+
+    /* Signature badge */
+    .pack-signature-note {
+      display: inline-block;
+      background: rgba(242,100,25,0.1);
+      border: 1px dashed rgba(242,100,25,0.35);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      color: var(--orange);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    /* ===========================
+       COMMENT ÇA MARCHE
+    =========================== */
+    #process { background: var(--navy); }
+
+    .process-header { text-align: center; margin-bottom: 64px; }
+
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    /* Connecting line */
+    .steps-row::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: calc(12.5% + 20px);
+      right: calc(12.5% + 20px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange) 0%, rgba(242,100,25,0.2) 100%);
+      border-radius: 1px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+      position: relative;
+    }
+
+    .step-num {
+      width: 80px; height: 80px;
+      background: var(--navy-light);
+      border: 2px solid rgba(242,100,25,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--ff-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--orange);
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 2;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+
+    .step:hover .step-num {
+      background: rgba(242,100,25,0.1);
+      border-color: var(--orange);
+      transform: scale(1.05);
+    }
+
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--white);
+    }
+
+    .step p {
+      font-size: 0.875rem;
+      color: var(--gray-text);
+      line-height: 1.6;
+    }
+
+    /* ===========================
+       FAQ
+    =========================== */
+    #faq {
+      background: var(--navy-mid);
+    }
+
+    #faq::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(242,100,25,0.4), transparent);
+    }
+
+    #faq { position: relative; }
+
+    .faq-header { text-align: center; margin-bottom: 56px; }
+
+    .faq-list {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color var(--transition);
+    }
+
+    .faq-item.open { border-color: rgba(242,100,25,0.3); }
+
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 26px;
+      font-weight: 500;
+      font-size: 0.975rem;
+      cursor: pointer;
+      user-select: none;
+      color: var(--white);
+      gap: 16px;
+    }
+
+    .faq-icon {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border: 1px solid rgba(242,100,25,0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-size: 1.1rem;
+      font-weight: 300;
+      transition: transform var(--transition), background var(--transition);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      background: rgba(242,100,25,0.1);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+      padding: 0 26px;
+    }
+
+    .faq-answer-inner {
+      padding-bottom: 22px;
+      font-size: 0.9rem;
+      color: var(--gray-text);
+      line-height: 1.7;
+    }
+
+    .faq-item.open .faq-answer { max-height: 300px; }
+
+    /* ===========================
+       CTA FINAL
+    =========================== */
+    #cta-final {
+      background: var(--navy);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta-final::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(242,100,25,0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .cta-box {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, var(--navy-light), rgba(242,100,25,0.06));
+      border: 1px solid rgba(242,100,25,0.2);
+      border-radius: 20px;
+      padding: 80px 48px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .cta-box h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .cta-box p {
+      font-size: 1.05rem;
+      color: var(--gray-text);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .cta-guarantee {
+      margin-top: 24px;
+      font-size: 0.82rem;
+      color: var(--gray-text);
+    }
+
+    .cta-guarantee strong { color: rgba(255,255,255,0.7); }
+
+    /* ===========================
+       FOOTER
+    =========================== */
+    footer {
+      background: rgba(0,0,0,0.35);
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-logo {
+      font-family: var(--ff-display);
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--white);
+    }
+
+    .footer-logo span { color: var(--orange); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 0.82rem;
+      color: var(--gray-text);
+      transition: color var(--transition);
+    }
+
+    .footer-links a:hover { color: var(--white); }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--gray-text);
+    }
+
+    /* ===========================
+       ANIMATIONS ON SCROLL
+    =========================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===========================
+       RESPONSIVE
+    =========================== */
+    @media (max-width: 1024px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-row { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+      .steps-row::before { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      section { padding: 64px 0; }
+      .problems-grid { grid-template-columns: 1fr; }
+      .solution-wrap { grid-template-columns: 1fr; }
+      .sol-card-stack { display: none; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .steps-row { grid-template-columns: 1fr; }
+      .hero-stat-card { display: none; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+      .cta-box { padding: 48px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================
+       NAVIGATION
+  ============================ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo">Still<span>Fi</span></a>
+      <div class="nav-menu">
+        <a href="#problemes">Problèmes</a>
+        <a href="#solution">Solution</a>
+        <a href="#offres">Tarifs</a>
+        <a href="#process">Fonctionnement</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <a href="#cta-final" class="nav-cta">Audit gratuit →</a>
+    </div>
+  </nav>
+
+
+  <!-- ============================
+       HERO
+  ============================ -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+
+    <div class="container">
+      <div class="hero-content reveal">
+        <div class="hero-tag">Back-office externalisé pour artisans</div>
+
+        <h1>Vous construisez.<br /><em>Nous structurons.</em></h1>
+
+        <p class="hero-sub">
+          StillFi gère vos devis, factures et relances pendant que vous êtes sur le chantier.
+          Concentrez-vous sur votre métier — nous gérons le reste.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#cta-final" class="btn-primary">
+            Réserver un audit gratuit
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+
+          <div class="hero-trust">
+            <div class="hero-trust-dots">
+              <div class="hero-trust-dot">P</div>
+              <div class="hero-trust-dot">É</div>
+              <div class="hero-trust-dot">M</div>
+            </div>
+            Rejoignez des artisans libérés du papier
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating stat card -->
+    <div class="hero-stat-card reveal">
+      <div class="stat-num">+8h</div>
+      <div class="stat-label">récupérées par semaine<br />en moyenne par artisan</div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       PROBLÈMES
+  ============================ -->
+  <section id="problemes">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-label">Le quotidien d'un artisan</span>
+        <h2 class="section-title">Vous n'êtes pas seul<br />à <span>galérer avec le papier</span></h2>
+      </div>
+
+      <div class="problems-grid">
+        <!-- Cards -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="problem-card reveal">
+            <div class="problem-icon">🌙</div>
+            <div>
+              <h3>Les devis le soir</h3>
+              <p>Après 10h de chantier, vous passez encore 2h à rédiger des devis. Votre soirée part en fumée, et votre famille attend.</p>
+            </div>
+          </div>
+
+          <div class="problem-card reveal">
+            <div class="problem-icon">💸</div>
+            <div>
+              <h3>Factures impayées</h3>
+              <p>Des clients qui "oublient" de payer. Vous n'osez pas relancer, par peur de froisser. Et la trésorerie s'en ressent.</p>
+            </div>
+          </div>
+
+          <div class="problem-card reveal">
+            <div class="problem-icon">📂</div>
+            <div>
+              <h3>Documents éparpillés</h3>
+              <p>PDF dans 3 dossiers différents, WhatsApp, email… Retrouver un devis de 6 mois devient une enquête.</p>
+            </div>
+          </div>
+
+          <div class="problem-card reveal">
+            <div class="problem-icon">📊</div>
+            <div>
+              <h3>Aucune visibilité financière</h3>
+              <p>Vous ne savez pas exactement ce que vous avez facturé ce mois-ci, ni ce qui a été réglé. Vous naviguez à vue.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quote -->
+        <div class="problems-visual reveal">
+          <blockquote class="problems-quote">
+            "Je passais mes dimanches à faire de la compta. Maintenant je les passe avec mes enfants."
+            <cite>— Michaël R., plombier indépendant, client StillFi</cite>
+          </blockquote>
+
+          <div style="margin-top: 32px; padding: 24px; background: rgba(242,100,25,0.07); border-radius: var(--radius); border: 1px solid rgba(242,100,25,0.15);">
+            <div style="font-size: 2.4rem; font-family: var(--ff-display); color: var(--orange); font-weight: 700;">73%</div>
+            <div style="font-size: 0.9rem; color: var(--gray-text); margin-top: 6px; line-height: 1.5;">des artisans indépendants déclarent que la gestion administrative est leur principale source de stress professionnel.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       SOLUTION
+  ============================ -->
+  <section id="solution">
+    <div class="container">
+      <div class="solution-wrap">
+        <div>
+          <div class="reveal">
+            <span class="section-label">Notre réponse</span>
+            <h2 class="section-title">On prend tout ça<br /><span>hors de vos mains</span></h2>
+            <p class="section-sub">StillFi devient votre assistant administratif à distance. Vous validez, nous exécutons.</p>
+          </div>
+
+          <ul class="solution-list">
+            <li class="reveal">
+              <span class="sol-check">✓</span>
+              Création et envoi de devis professionnels
+            </li>
+            <li class="reveal">
+              <span class="sol-check">✓</span>
+              Facturation précise et dans les délais
+            </li>
+            <li class="reveal">
+              <span class="sol-check">✓</span>
+              Relances clients automatisées et courtoises
+            </li>
+            <li class="reveal">
+              <span class="sol-check">✓</span>
+              Organisation et archivage de vos documents
+            </li>
+            <li class="reveal">
+              <span class="sol-check">✓</span>
+              Reporting mensuel sur votre activité
+            </li>
+          </ul>
+        </div>
+
+        <!-- Visual stack -->
+        <div class="solution-visual reveal">
+          <div class="sol-card-stack">
+            <div class="sol-card">
+              <div class="sol-card-label">Devis · Avril 2025</div>
+              <div class="sol-card-title">Réfection toiture M. Bernard</div>
+              <div class="sol-card-line"></div>
+              <div class="sol-card-line short"></div>
+              <div class="sol-card-line accent"></div>
+              <div class="sol-card-footer">
+                <div style="font-size:0.8rem; color:var(--gray-text);">Total TTC</div>
+                <div style="font-family:var(--ff-display); font-size:1.4rem; color:var(--white);">3 240 €</div>
+                <div class="sol-badge">✓ Envoyé</div>
+              </div>
+            </div>
+            <div class="sol-card"></div>
+            <div class="sol-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       OFFRES
+  ============================ -->
+  <section id="offres">
+    <div class="container">
+      <div class="offres-header reveal">
+        <span class="section-label">Nos formules</span>
+        <h2 class="section-title">Choisissez votre <span>niveau de sérénité</span></h2>
+        <p class="section-sub">Nous nous adressons aux artisans et aux TPE/PME. Tous nos packs incluent un onboarding personnalisé. Sans engagement la 1ère année.</p>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- Pack Essentiel -->
+        <div class="pack-card reveal">
+          <div class="pack-name">Essentiel</div>
+          <div class="pack-price">379€<span>/mois HT</span></div>
+          <p class="pack-desc">Idéal pour démarrer et reprendre le contrôle de votre administration.</p>
+          <ul class="pack-features">
+            <li>15 documents par mois</li>
+            <li>1 relance par facture</li>
+            <li>Archivage numérique</li>
+            <li>Support par email</li>
+          </ul>
+          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+        </div>
+
+        <!-- Pack Confort (featured) -->
+        <div class="pack-card featured reveal">
+          <div class="pack-name">Confort</div>
+          <div class="pack-price">579€<span>/mois HT</span></div>
+          <p class="pack-desc">Pour l'artisan qui veut une vraie visibilité sur son chiffre d'affaires.</p>
+          <ul class="pack-features">
+            <li>40 documents par mois</li>
+            <li>Relances multiples</li>
+            <li>Tableau de bord chiffre d'affaires</li>
+            <li>Support WhatsApp</li>
+            <li>Onboarding dédié</li>
+          </ul>
+          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+        </div>
+
+        <!-- Pack Premium -->
+        <div class="pack-card reveal">
+          <div class="pack-name">Premium</div>
+          <div class="pack-price">879€<span>/mois HT</span></div>
+          <p class="pack-desc">Gestion complète pour les artisans avec forte activité et équipe.</p>
+          <ul class="pack-features">
+            <li>Gestion administrative complète</li>
+            <li>Reporting mensuel détaillé</li>
+            <li>1 appel stratégique mensuel</li>
+            <li>Support prioritaire</li>
+            <li>Documents illimités</li>
+          </ul>
+          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+        </div>
+
+        <!-- Pack Signature -->
+        <div class="pack-card reveal">
+          <div class="pack-name">Signature</div>
+          <div class="pack-price">1 390€<span>/mois HT</span></div>
+          <div class="pack-signature-note">Sur étude personnalisée</div>
+          <ul class="pack-features">
+            <li>Direction administrative externalisée</li>
+            <li>Structuration de vos process</li>
+            <li>Analyse rentabilité chantiers</li>
+            <li>Coordination comptable</li>
+            <li>2 appels stratégiques/mois</li>
+            <li>Support prioritaire &lt;12h</li>
+          </ul>
+          <a href="#cta-final" class="btn-pack">Prendre rendez-vous</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       COMMENT ÇA MARCHE
+  ============================ -->
+  <section id="process">
+    <div class="container">
+      <div class="process-header reveal">
+        <span class="section-label">Mise en place</span>
+        <h2 class="section-title">Opérationnel en <span>72 heures</span></h2>
+        <p class="section-sub" style="margin: 0 auto;">Un processus simple, pensé pour des artisans avec peu de temps.</p>
+      </div>
+
+      <div class="steps-row">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <h3>Audit gratuit</h3>
+          <p>On échange 30 minutes pour comprendre votre activité, vos besoins et vos points de friction actuels.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">2</div>
+          <h3>Onboarding personnalisé</h3>
+          <p>On configure vos outils, vos modèles de devis et de factures, à votre image professionnelle.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">3</div>
+          <h3>Vous travaillez, on gère</h3>
+          <p>Vous nous envoyez les infos depuis le chantier. On s'occupe du reste — sans vous déranger.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">4</div>
+          <h3>Bilan mensuel</h3>
+          <p>Chaque mois, vous recevez un résumé clair de votre activité, votre CA et vos impayés.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       FAQ
+  ============================ -->
+  <section id="faq">
+    <div class="container">
+      <div class="faq-header reveal">
+        <span class="section-label">Questions fréquentes</span>
+        <h2 class="section-title">Vous avez des <span>questions ?</span></h2>
+      </div>
+
+      <div class="faq-list">
+
+        <div class="faq-item reveal">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Est-ce que StillFi remplace mon comptable ?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Non, StillFi ne remplace pas votre expert-comptable. Nous gérons votre back-office opérationnel : devis, factures, relances et organisation. Nous travaillons en complémentarité avec votre comptable et pouvons même coordonner avec lui sur les packs Premium et Signature.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Combien de temps faut-il pour que tout soit en place ?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Après votre audit gratuit, l'onboarding prend généralement 24 à 48 heures ouvrées. Nous configurons vos modèles, vos outils et votre espace de travail pour que vous soyez opérationnel très rapidement — sans effort de votre côté.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Comment se passe la communication au quotidien ?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Selon votre pack, nous communiquons par email ou WhatsApp. L'idée est simple : vous nous envoyez les informations depuis votre téléphone (photo de bon de commande, nom du client, montant…) et nous transformons ça en document professionnel dans la journée.
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Puis-je changer de pack ou résilier à tout moment ?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">
+              Oui. Nos packs sont sans engagement ferme. Vous pouvez monter en gamme à tout moment si votre activité évolue, ou résilier avec un préavis d'un mois. Nous préférons que vous restiez parce que vous êtes satisfait, pas parce que vous y êtes obligé.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       CTA FINAL
+  ============================ -->
+  <section id="cta-final">
+    <div class="container">
+      <div class="cta-box reveal">
+        <span class="section-label">Passez à l'action</span>
+
+        <h2>Arrêtez de perdre vos soirées<br /><span style="color: var(--orange);">sur de la paperasse.</span></h2>
+
+        <p>Réservez votre audit gratuit de 30 minutes. Sans engagement, sans jargon — juste une conversation honnête sur ce qu'on peut faire pour vous.</p>
+
+        <a href="mailto:contact@stillfi.fr?subject=Demande d'audit gratuit" class="btn-primary" style="display: inline-flex; font-size: 1.05rem; padding: 18px 40px;">
+          Réserver mon audit gratuit
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+
+        <p class="cta-guarantee">
+          <strong>100% gratuit.</strong> Aucune carte bancaire requise. Réponse sous 24h.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================
+       FOOTER
+  ============================ -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">Still<span>Fi</span></div>
+
+        <div class="footer-links">
+          <a href="mailto:contact@stillfi.fr">contact@stillfi.fr</a>
+          <a href="#">Mentions légales</a>
+          <a href="#">Politique de confidentialité</a>
+          <a href="#">CGV</a>
+        </div>
+
+        <div class="footer-copy">© 2025 StillFi. Tous droits réservés.</div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ============================
+       JAVASCRIPT
+  ============================ -->
+  <script>
+    /* --- Navbar scroll effect --- */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    /* --- Scroll reveal animation --- */
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Stagger elements in same parent
+          const siblings = [...entry.target.parentElement.querySelectorAll('.reveal:not(.visible)')];
+          const delay = siblings.indexOf(entry.target) * 80;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    reveals.forEach(el => observer.observe(el));
+
+    /* --- FAQ accordion --- */
+    function toggleFaq(trigger) {
+      const item = trigger.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+
+      // Close all
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+
+      // Open clicked (if it wasn't already open)
+      if (!isOpen) item.classList.add('open');
+    }
+
+    /* --- Smooth anchor links --- */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+<!-- Version: 1.0.2 -->
+</body>
+</html>
