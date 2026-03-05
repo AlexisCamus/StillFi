@@ -122,6 +122,19 @@
       margin: 0 auto;
     }
 
+    /* ensure menu sits between logo and CTA */
+    .nav-menu {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    /* hide hamburger on wider screens */
+    .nav-toggle {
+      display: none;
+    }
+
     .logo {
       font-family: var(--ff-display);
       font-size: 1.5rem;
@@ -132,10 +145,7 @@
 
     .logo span { color: var(--orange); }
 
-    .nav-menu {
-      display: flex;
-      gap: 16px;
-    }
+
 
     .nav-menu a {
       font-size: 0.9rem;
