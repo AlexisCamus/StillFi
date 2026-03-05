@@ -213,54 +213,82 @@
     .modal.show { display: flex; }
     .modal-content {
       background: var(--white);
-      padding: 32px 28px;
-      border-radius: var(--radius);
+      padding: 40px 32px;
+      border-radius: calc(var(--radius) + 4px);
       width: 100%;
-      max-width: 480px;
+      max-width: 420px;
       color: var(--navy);
       position: relative;
       box-shadow: var(--shadow-card);
       font-size: 0.95rem;
+      font-family: var(--ff-body);
     }
-    .modal-content h2 { margin-bottom: 8px; font-size: 1.25rem; }
-    .modal-content h2 + p { font-style: italic; color: var(--gray-text); margin-bottom: 16px; }
+    .modal-content h2 {
+      margin-bottom: 6px;
+      font-size: 1.35rem;
+      font-family: var(--ff-display);
+      font-weight: 700;
+      color: var(--navy-light);
+    }
+    .modal-content h2 + p {
+      font-style: italic;
+      color: var(--gray-text);
+      margin-bottom: 20px;
+      font-size: 0.92rem;
+    }
     .modal-content label {
       display: block;
-      margin: 10px 0 4px;
-      font-weight: 500;
+      margin: 12px 0 4px;
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      color: var(--navy-light);
+    }
+    .modal-content .asterisk {
+      color: var(--orange);
+      margin-left: 2px;
     }
     .modal-content input {
       width: 100%;
-      padding: 6px 0;
+      padding: 8px 0;
       border: none;
       border-bottom: 1px solid var(--gray-soft);
       background: transparent;
       color: var(--navy);
+      font-size: 0.95rem;
     }
     .modal-content input:focus {
       outline: none;
       border-color: var(--orange);
     }
+    .modal-content input::placeholder {
+      color: var(--gray-text);
+      font-style: italic;
+    }
     .modal-content button {
-      margin-top: 24px;
-      background: var(--navy);
+      margin-top: 28px;
+      background: var(--orange);
       border: none;
-      padding: 12px 20px;
+      padding: 12px 24px;
       border-radius: 6px;
       color: var(--white);
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      font-size: 0.95rem;
+      transition: background var(--transition);
     }
     .modal-content button:hover {
-      background: var(--navy-light);
+      background: var(--orange-lt);
     }
     .modal-content .close-btn {
       background: transparent;
       border: none;
       position: absolute;
       top: 8px; right: 12px;
-      font-size: 1.4rem;
-      color: var(--navy);
+      font-size: 1.6rem;
+      color: var(--navy-light);
       cursor: pointer;
     }
       border-radius: 50%;
@@ -1594,23 +1622,23 @@
   <div class="modal" id="contactModal">
     <div class="modal-content">
       <button class="close-btn" id="closeModal">×</button>
-      <h2>Contactez notre équipe</h2>
-      <p>Un membre de StillFi reviendra vers vous sous 24 h.</p>
+      <h2>Réserver mon rendez-vous</h2>
+      <p>Rendez-vous de 30 minutes</p>
       <form action="mailto:youremail@example.com" method="post" enctype="text/plain">
-        <label for="nom">Nom</label>
-        <input type="text" id="nom" name="Nom" required />
+        <label for="nom">Nom *<span class="asterisk"></span></label>
+        <input type="text" id="nom" name="Nom" placeholder="Votre nom" required />
 
-        <label for="prenom">Prénom</label>
-        <input type="text" id="prenom" name="Prénom" required />
+        <label for="prenom">Prénom *<span class="asterisk"></span></label>
+        <input type="text" id="prenom" name="Prénom" placeholder="Votre prénom" required />
 
-        <label for="tel">Téléphone</label>
-        <input type="tel" id="tel" name="Téléphone" required />
+        <label for="tel">Téléphone *<span class="asterisk"></span></label>
+        <input type="tel" id="tel" name="Téléphone" placeholder="06 XX XX XX XX" required />
 
-        <label for="email">Email</label>
-        <input type="email" id="email" name="Email" required />
+        <label for="email">Email *<span class="asterisk"></span></label>
+        <input type="email" id="email" name="Email" placeholder="votre@adresse.com" required />
 
-        <label for="profession">Profession</label>
-        <input type="text" id="profession" name="Profession" required />
+        <label for="profession">Profession *<span class="asterisk"></span></label>
+        <input type="text" id="profession" name="Profession" placeholder="Votre métier" required />
 
         <button type="submit">Soumettre la demande</button>
       </form>
